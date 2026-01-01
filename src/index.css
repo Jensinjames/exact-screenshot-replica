@@ -1,96 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* King Cakes Order Management - Mardi Gras Inspired Design System */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Mardi Gras color palette - warm, festive bakery feel */
+    --background: 45 30% 98%;
+    --foreground: 270 30% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 270 30% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 270 30% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Royal Purple - primary brand color */
+    --primary: 270 50% 40%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Golden Yellow - secondary accent */
+    --secondary: 45 90% 55%;
+    --secondary-foreground: 270 30% 15%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Soft cream for muted elements */
+    --muted: 45 20% 94%;
+    --muted-foreground: 270 15% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Emerald Green - accent/success */
+    --accent: 145 55% 35%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 45 15% 88%;
+    --input: 45 15% 88%;
+    --ring: 270 50% 40%;
 
-    --radius: 0.5rem;
+    --radius: 0.625rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Status colors */
+    --status-pending: 45 90% 55%;
+    --status-in-production: 200 80% 50%;
+    --status-ready: 145 55% 35%;
+    --status-fulfilled: 270 50% 40%;
+    --status-cancelled: 0 72% 51%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    /* Sidebar - slightly darker cream */
+    --sidebar-background: 45 25% 96%;
+    --sidebar-foreground: 270 30% 25%;
+    --sidebar-primary: 270 50% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 45 30% 92%;
+    --sidebar-accent-foreground: 270 30% 20%;
+    --sidebar-border: 45 20% 88%;
+    --sidebar-ring: 270 50% 40%;
 
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Typography */
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 270 25% 8%;
+    --foreground: 45 20% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 270 20% 12%;
+    --card-foreground: 45 20% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 270 20% 12%;
+    --popover-foreground: 45 20% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 270 45% 60%;
+    --primary-foreground: 270 30% 10%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 45 80% 50%;
+    --secondary-foreground: 270 30% 10%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 270 15% 18%;
+    --muted-foreground: 45 15% 65%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 145 45% 45%;
+    --accent-foreground: 270 30% 10%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 270 15% 20%;
+    --input: 270 15% 20%;
+    --ring: 270 45% 60%;
+
+    --sidebar-background: 270 20% 10%;
+    --sidebar-foreground: 45 20% 90%;
+    --sidebar-primary: 270 45% 60%;
+    --sidebar-primary-foreground: 270 30% 10%;
+    --sidebar-accent: 270 15% 15%;
+    --sidebar-accent-foreground: 45 20% 90%;
+    --sidebar-border: 270 15% 18%;
+    --sidebar-ring: 270 45% 60%;
   }
 }
 
@@ -100,6 +111,64 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .status-pending {
+    background-color: hsl(var(--status-pending) / 0.15);
+    color: hsl(var(--status-pending));
+    border: 1px solid hsl(var(--status-pending) / 0.3);
+  }
+
+  .status-in-production {
+    background-color: hsl(var(--status-in-production) / 0.15);
+    color: hsl(var(--status-in-production));
+    border: 1px solid hsl(var(--status-in-production) / 0.3);
+  }
+
+  .status-ready {
+    background-color: hsl(var(--status-ready) / 0.15);
+    color: hsl(var(--status-ready));
+    border: 1px solid hsl(var(--status-ready) / 0.3);
+  }
+
+  .status-fulfilled {
+    background-color: hsl(var(--status-fulfilled) / 0.15);
+    color: hsl(var(--status-fulfilled));
+    border: 1px solid hsl(var(--status-fulfilled) / 0.3);
+  }
+
+  .status-cancelled {
+    background-color: hsl(var(--status-cancelled) / 0.15);
+    color: hsl(var(--status-cancelled));
+    border: 1px solid hsl(var(--status-cancelled) / 0.3);
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
+  }
+
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(270 50% 50%));
+  }
+
+  .gradient-gold {
+    background: linear-gradient(135deg, hsl(var(--secondary)), hsl(35 90% 50%));
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
 }
