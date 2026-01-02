@@ -283,12 +283,37 @@ export type Database = {
         }
         Relationships: []
       }
+      team_memberships: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["team_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["team_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["team_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_team_access: { Args: never; Returns: boolean }
+      is_team_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       cake_size: "mini" | "medium" | "large" | "super"
@@ -300,6 +325,7 @@ export type Database = {
         | "ready"
         | "fulfilled"
         | "cancelled"
+      team_role: "admin" | "member"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -437,6 +463,7 @@ export const Constants = {
         "fulfilled",
         "cancelled",
       ],
+      team_role: ["admin", "member"],
     },
   },
 } as const
