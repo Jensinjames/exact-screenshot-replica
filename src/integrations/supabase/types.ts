@@ -126,13 +126,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-          foreignKeyName: "order_items_product_id_fkey"
-          columns: ["product_id"]
-          isOneToOne: false
-          referencedRelation: "products"
-          referencedColumns: ["id"]
-        },
-      ]
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       orders: {
         Row: {
@@ -283,36 +283,12 @@ export type Database = {
         }
         Relationships: []
       }
-      team_memberships: {
-        Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["team_role"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["team_role"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["team_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      has_team_access: {
-        Args: Record<string, never>
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       cake_size: "mini" | "medium" | "large" | "super"
@@ -324,7 +300,6 @@ export type Database = {
         | "ready"
         | "fulfilled"
         | "cancelled"
-      team_role: "admin" | "member"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -462,7 +437,6 @@ export const Constants = {
         "fulfilled",
         "cancelled",
       ],
-      team_role: ["admin", "member"],
     },
   },
 } as const
