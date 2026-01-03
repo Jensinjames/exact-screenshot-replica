@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AppLayout from "@/components/layout/AppLayout";
-import AdminRoute from "@/components/AdminRoute";
 
 // Pages
 import Auth from "./pages/Auth";
@@ -17,7 +16,6 @@ import OrderDetail from "./pages/OrderDetail";
 import Customers from "./pages/Customers";
 import Production from "./pages/Production";
 import Inventory from "./pages/Inventory";
-import Team from "./pages/Team";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -101,16 +99,6 @@ const App = () => (
                     <Inventory />
                   </AppLayout>
                 </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/team"
-              element={
-                <AdminRoute>
-                  <AppLayout>
-                    <Team />
-                  </AppLayout>
-                </AdminRoute>
               }
             />
             

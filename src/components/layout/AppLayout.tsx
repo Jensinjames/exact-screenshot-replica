@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useIsAdmin } from '@/hooks/useTeam';
 import { Button } from '@/components/ui/button';
 import {
   Sidebar,
@@ -25,7 +24,6 @@ import {
   Package,
   Crown,
   LogOut,
-  UserCog,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -34,26 +32,22 @@ interface AppLayoutProps {
 }
 
 const menuItems = [
-  { title: 'Dashboard', icon: LayoutDashboard, path: '/', adminOnly: false },
-  { title: 'Orders', icon: ShoppingCart, path: '/orders', adminOnly: false },
-  { title: 'Customers', icon: Users, path: '/customers', adminOnly: false },
-  { title: 'Production', icon: Calendar, path: '/production', adminOnly: false },
-  { title: 'Inventory', icon: Package, path: '/inventory', adminOnly: false },
-  { title: 'Team', icon: UserCog, path: '/team', adminOnly: true },
+  { title: 'Dashboard', icon: LayoutDashboard, path: '/' },
+  { title: 'Orders', icon: ShoppingCart, path: '/orders' },
+  { title: 'Customers', icon: Users, path: '/customers' },
+  { title: 'Production', icon: Calendar, path: '/production' },
+  { title: 'Inventory', icon: Package, path: '/inventory' },
 ];
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
-  const { data: isAdmin } = useIsAdmin();
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/auth');
   };
-
-  const visibleMenuItems = menuItems.filter(item => !item.adminOnly || isAdmin);
 
   return (
     <SidebarProvider>
@@ -75,8 +69,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <SidebarGroup>
               <SidebarGroupLabel>Menu</SidebarGroupLabel>
               <SidebarGroupContent>
-              <SidebarMenu>
-                  {visibleMenuItems.map((item) => (
+                <SidebarMenu>
+                  {menuItems.map((item) => (
                     <SidebarMenuItem key={item.path}>
                       <SidebarMenuButton
                         asChild
