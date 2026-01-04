@@ -1,7 +1,10 @@
 import { ReactNode } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsAdmin } from '@/hooks/useTeam';
+import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Sidebar,
   SidebarContent,
@@ -24,6 +27,8 @@ import {
   Package,
   Crown,
   LogOut,
+  Settings,
+  UserCog,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -43,10 +48,22 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { isAdmin } = useIsAdmin();
+  const { profile } = useProfile();
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/auth');
+  };
+
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
@@ -89,13 +106,57 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
+
+            <SidebarGroup>
+              <SidebarGroupLabel>Account</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={location.pathname === '/settings'}
+                      className={cn(
+                        location.pathname === '/settings' && 'bg-sidebar-accent text-sidebar-accent-foreground'
+                      )}
+                    >
+                      <Link to="/settings">
+                        <Settings className="w-4 h-4" />
+                        <span>Settings</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  {isAdmin && (
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={location.pathname === '/team'}
+                        className={cn(
+                          location.pathname === '/team' && 'bg-sidebar-accent text-sidebar-accent-foreground'
+                        )}
+                      >
+                        <Link to="/team">
+                          <UserCog className="w-4 h-4" />
+                          <span>Team</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
           </SidebarContent>
 
           <SidebarFooter className="border-t border-sidebar-border p-4">
             <div className="flex items-center gap-3">
+              <Avatar className="w-9 h-9">
+                <AvatarImage src={profile?.avatar_url || ''} />
+                <AvatarFallback className="text-xs">
+                  {getInitials(profile?.full_name || user?.user_metadata?.full_name)}
+                </AvatarFallback>
+              </Avatar>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate text-sidebar-foreground">
-                  {user?.user_metadata?.full_name || user?.email}
+                  {profile?.full_name || user?.user_metadata?.full_name || user?.email}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
               </div>
