@@ -16,7 +16,10 @@ import OrderDetail from "./pages/OrderDetail";
 import Customers from "./pages/Customers";
 import Production from "./pages/Production";
 import Inventory from "./pages/Inventory";
+import Settings from "./pages/Settings";
+import Team from "./pages/Team";
 import NotFound from "./pages/NotFound";
+import AdminRoute from "@/components/AdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -97,6 +100,28 @@ const App = () => (
                 <ProtectedRoute>
                   <AppLayout>
                     <Inventory />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Settings />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/team"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <AdminRoute>
+                      <Team />
+                    </AdminRoute>
                   </AppLayout>
                 </ProtectedRoute>
               }
