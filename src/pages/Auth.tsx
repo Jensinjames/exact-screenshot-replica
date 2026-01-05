@@ -19,9 +19,10 @@ export default function Auth() {
   const { user, signIn, signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   
-  // Check for invited email in URL
+  // Check for invited email and token in URL
   const invitedEmail = searchParams.get('invited_email') || '';
-  const isInvited = Boolean(invitedEmail);
+  const invitationToken = searchParams.get('token') || '';
+  const isInvited = Boolean(invitedEmail && invitationToken);
   
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -87,7 +88,7 @@ export default function Auth() {
     }
 
     setIsLoading(true);
-    const { error } = await signUp(signupEmail, signupPassword, signupFullName);
+    const { error } = await signUp(signupEmail, signupPassword, signupFullName, invitationToken || undefined);
     setIsLoading(false);
 
     if (error) {

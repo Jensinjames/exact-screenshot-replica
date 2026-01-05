@@ -25,7 +25,7 @@ import { toast } from 'sonner';
 const emailSchema = z.string().email('Please enter a valid email address');
 
 interface InviteTeamMemberDialogProps {
-  onInvite: (email: string, role: 'admin' | 'member') => Promise<{ error: Error | null }>;
+  onInvite: (email: string, role: 'admin' | 'member') => Promise<{ error: Error | null; data?: { token: string } }>;
 }
 
 export default function InviteTeamMemberDialog({ onInvite }: InviteTeamMemberDialogProps) {
@@ -52,10 +52,10 @@ export default function InviteTeamMemberDialog({ onInvite }: InviteTeamMemberDia
     const result = await onInvite(email, role);
     setLoading(false);
 
-    if (!result.error) {
-      // Generate the invite link
+    if (!result.error && result.data?.token) {
+      // Generate the invite link with secure token
       const baseUrl = window.location.origin;
-      const link = `${baseUrl}/auth?invited_email=${encodeURIComponent(email)}`;
+      const link = `${baseUrl}/auth?invited_email=${encodeURIComponent(email)}&token=${result.data.token}`;
       setInviteLink(link);
     }
   };
