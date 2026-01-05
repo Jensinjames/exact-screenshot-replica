@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Crown, Loader2 } from 'lucide-react';
+import { Crown, Loader2, Mail } from 'lucide-react';
 import { z } from 'zod';
 
 const emailSchema = z.string().email('Please enter a valid email address');
@@ -15,15 +15,23 @@ const passwordSchema = z.string().min(6, 'Password must be at least 6 characters
 
 export default function Auth() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user, signIn, signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Check for invited email in URL
+  const invitedEmail = searchParams.get('invited_email') || '';
+  const isInvited = Boolean(invitedEmail);
   
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   
-  const [signupEmail, setSignupEmail] = useState('');
+  const [signupEmail, setSignupEmail] = useState(invitedEmail);
   const [signupPassword, setSignupPassword] = useState('');
   const [signupFullName, setSignupFullName] = useState('');
+  
+  // Default to signup tab if invited
+  const [activeTab, setActiveTab] = useState(isInvited ? 'signup' : 'login');
 
   useEffect(() => {
     if (user) {
@@ -105,8 +113,20 @@ export default function Auth() {
           <p className="text-muted-foreground mt-2">Order Management System</p>
         </div>
 
+        {isInvited && (
+          <div className="mb-4 p-4 rounded-lg bg-primary/10 border border-primary/20">
+            <div className="flex items-center gap-2 text-primary">
+              <Mail className="w-5 h-5" />
+              <span className="font-medium">You've been invited!</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Create an account to join the team.
+            </p>
+          </div>
+        )}
+
         <Card className="border-border/50 shadow-lg">
-          <Tabs defaultValue="login" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <CardHeader className="pb-4">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Sign In</TabsTrigger>

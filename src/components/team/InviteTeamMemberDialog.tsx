@@ -18,8 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, UserPlus } from 'lucide-react';
+import { Check, Copy, Loader2, UserPlus } from 'lucide-react';
 import { z } from 'zod';
+import { toast } from 'sonner';
 
 const emailSchema = z.string().email('Please enter a valid email address');
 
@@ -33,6 +34,8 @@ export default function InviteTeamMemberDialog({ onInvite }: InviteTeamMemberDia
   const [role, setRole] = useState<'admin' | 'member'>('member');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [inviteLink, setInviteLink] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,14 +53,38 @@ export default function InviteTeamMemberDialog({ onInvite }: InviteTeamMemberDia
     setLoading(false);
 
     if (!result.error) {
+      // Generate the invite link
+      const baseUrl = window.location.origin;
+      const link = `${baseUrl}/auth?invited_email=${encodeURIComponent(email)}`;
+      setInviteLink(link);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(inviteLink);
+      setCopied(true);
+      toast.success('Link copied to clipboard');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('Failed to copy link');
+    }
+  };
+
+  const handleClose = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      // Reset state when dialog closes
       setEmail('');
       setRole('member');
-      setOpen(false);
+      setError('');
+      setInviteLink('');
+      setCopied(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogTrigger asChild>
         <Button>
           <UserPlus className="w-4 h-4 mr-2" />
@@ -65,51 +92,93 @@ export default function InviteTeamMemberDialog({ onInvite }: InviteTeamMemberDia
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>Invite Team Member</DialogTitle>
-            <DialogDescription>
-              Send an invitation to join your team. They'll receive access when they sign up.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="colleague@example.com"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setError('');
-                }}
-              />
-              {error && <p className="text-sm text-destructive">{error}</p>}
+        {inviteLink ? (
+          <>
+            <DialogHeader>
+              <DialogTitle>Invitation Created</DialogTitle>
+              <DialogDescription>
+                Share this link with <strong>{email}</strong> to invite them as {role === 'admin' ? 'an Admin' : 'a Member'}.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>Invitation Link</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={inviteLink}
+                    readOnly
+                    className="font-mono text-sm"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={handleCopyLink}
+                    className="shrink-0"
+                  >
+                    {copied ? (
+                      <Check className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  This invitation expires in 7 days.
+                </p>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
-              <Select value={role} onValueChange={(v) => setRole(v as 'admin' | 'member')}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="member">Member - Can manage orders and data</SelectItem>
-                  <SelectItem value="admin">Admin - Full access including team management</SelectItem>
-                </SelectContent>
-              </Select>
+            <DialogFooter>
+              <Button onClick={() => handleClose(false)}>Done</Button>
+            </DialogFooter>
+          </>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <DialogHeader>
+              <DialogTitle>Invite Team Member</DialogTitle>
+              <DialogDescription>
+                Create an invitation link to share with your new team member.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="colleague@example.com"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setError('');
+                  }}
+                />
+                {error && <p className="text-sm text-destructive">{error}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="role">Role</Label>
+                <Select value={role} onValueChange={(v) => setRole(v as 'admin' | 'member')}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="member">Member - Can manage orders and data</SelectItem>
+                    <SelectItem value="admin">Admin - Full access including team management</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Send Invitation
-            </Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => handleClose(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Create Invitation
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );
