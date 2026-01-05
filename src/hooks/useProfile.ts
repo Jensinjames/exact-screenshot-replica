@@ -41,7 +41,7 @@ export function useProfile() {
       if (error) throw error;
       setProfile(data);
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      // Silent fail - profile may not exist yet for new users
     } finally {
       setLoading(false);
     }
