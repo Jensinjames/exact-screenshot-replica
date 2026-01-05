@@ -43,7 +43,7 @@ export function useIsAdmin() {
       if (error) throw error;
       setIsAdmin(data?.role === 'admin');
     } catch (error) {
-      console.error('Error checking admin status:', error);
+      // Silent fail - user may not be a team member
       setIsAdmin(false);
     } finally {
       setLoading(false);
@@ -91,7 +91,7 @@ export function useTeamMembers() {
       
       setMembers(memberData);
     } catch (error) {
-      console.error('Error fetching team members:', error);
+      // Silent fail - handled by empty state
     } finally {
       setLoading(false);
     }
@@ -184,7 +184,7 @@ export function useTeamInvitations() {
       if (error) throw error;
       setInvitations(data || []);
     } catch (error) {
-      console.error('Error fetching invitations:', error);
+      // Silent fail - handled by empty state
     } finally {
       setLoading(false);
     }
