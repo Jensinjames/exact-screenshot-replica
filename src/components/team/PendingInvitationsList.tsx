@@ -19,6 +19,7 @@ interface Invitation {
   role: 'admin' | 'member';
   created_at: string;
   expires_at: string;
+  token: string;
 }
 
 interface PendingInvitationsListProps {
@@ -34,7 +35,7 @@ export default function PendingInvitationsList({
 
   const handleCopyLink = async (invitation: Invitation) => {
     const baseUrl = window.location.origin;
-    const link = `${baseUrl}/auth?invited_email=${encodeURIComponent(invitation.email)}`;
+    const link = `${baseUrl}/auth?invited_email=${encodeURIComponent(invitation.email)}&token=${invitation.token}`;
     
     try {
       await navigator.clipboard.writeText(link);
