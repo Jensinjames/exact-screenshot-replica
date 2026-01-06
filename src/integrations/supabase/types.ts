@@ -286,6 +286,33 @@ export type Database = {
         }
         Relationships: []
       }
+      signup_attempts: {
+        Row: {
+          attempted_at: string | null
+          email: string
+          id: string
+          ip_address: string | null
+          success: boolean | null
+          token_provided: boolean | null
+        }
+        Insert: {
+          attempted_at?: string | null
+          email: string
+          id?: string
+          ip_address?: string | null
+          success?: boolean | null
+          token_provided?: boolean | null
+        }
+        Update: {
+          attempted_at?: string | null
+          email?: string
+          id?: string
+          ip_address?: string | null
+          success?: boolean | null
+          token_provided?: boolean | null
+        }
+        Relationships: []
+      }
       team_invitations: {
         Row: {
           accepted_at: string | null
@@ -348,6 +375,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_signup_rate_limit: {
+        Args: {
+          p_email: string
+          p_max_attempts?: number
+          p_window_minutes?: number
+        }
+        Returns: boolean
+      }
+      cleanup_old_signup_attempts: { Args: never; Returns: undefined }
       has_team_access: { Args: never; Returns: boolean }
       is_team_admin: { Args: never; Returns: boolean }
     }
