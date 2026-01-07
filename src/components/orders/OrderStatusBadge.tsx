@@ -1,4 +1,4 @@
-import type { OrderStatus } from '@/hooks/useData';
+import type { OrderStatus } from '@/types';
 import { cn } from '@/lib/utils';
 
 interface OrderStatusBadgeProps {
