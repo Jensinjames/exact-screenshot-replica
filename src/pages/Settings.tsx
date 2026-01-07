@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useProfile } from '@/hooks/useProfile';
+import { useProfile } from '@/hooks/profile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

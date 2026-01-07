@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useProductionPlan, useProducts, type CakeSize, type CakeVariety } from '@/hooks/useData';
+import { useProductionPlan } from '@/hooks/production';
+import { useProducts } from '@/hooks/products';
+import type { CakeSize, CakeVariety } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';

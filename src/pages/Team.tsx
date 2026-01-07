@@ -1,4 +1,4 @@
-import { useTeamMembers, useTeamInvitations } from '@/hooks/useTeam';
+import { useTeamMembers, useTeamInvitations } from '@/hooks/team';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';

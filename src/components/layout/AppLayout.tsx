@@ -1,8 +1,8 @@
 import { ReactNode } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useIsAdmin } from '@/hooks/useTeam';
-import { useProfile } from '@/hooks/useProfile';
+import { useIsAdmin } from '@/hooks/team';
+import { useProfile } from '@/hooks/profile';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {

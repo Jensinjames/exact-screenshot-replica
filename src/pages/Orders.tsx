@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useOrders } from '@/hooks/useData';
+import { useOrders } from '@/hooks/orders';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,7 +22,7 @@ import {
 import { Plus, Search, Filter } from 'lucide-react';
 import { format } from 'date-fns';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
-import type { OrderStatus } from '@/hooks/useData';
+import type { OrderStatus } from '@/types';
 
 export default function Orders() {
   const { data: orders, isLoading } = useOrders();

@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useIsAdmin } from '@/hooks/useTeam';
+import { useIsAdmin } from '@/hooks/team';
 import { Loader2 } from 'lucide-react';
 
 interface AdminRouteProps {
