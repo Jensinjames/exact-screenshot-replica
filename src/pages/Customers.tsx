@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/integrations/supabase/client';
-import { useCustomers, useUpdateCustomer } from '@/hooks/customers';
+import { useCustomers, useUpdateCustomer, useDeleteCustomers } from '@/hooks/customers';
 import { useIsAdmin } from '@/hooks/team/useIsAdmin';
 import { customerSchema, type CustomerFormData } from '@/schemas';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
   Select,
   SelectContent,
@@ -43,7 +54,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { toast } from 'sonner';
-import { Plus, Search, User, Building2, Loader2, Pencil } from 'lucide-react';
+import { Plus, Search, User, Building2, Loader2, Pencil, Trash2, Download } from 'lucide-react';
+import { exportToCSV } from '@/utils/export';
 
 type Customer = {
   id: string;
@@ -64,6 +76,8 @@ export default function Customers() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const form = useForm<CustomerFormData>({
     resolver: zodResolver(customerSchema),
@@ -114,6 +128,7 @@ export default function Customers() {
   });
 
   const updateCustomerMutation = useUpdateCustomer();
+  const deleteCustomersMutation = useDeleteCustomers();
 
   const onSubmit = (data: CustomerFormData) => {
     createCustomerMutation.mutate(data);
@@ -163,6 +178,55 @@ export default function Customers() {
 
   const retailCount = customers?.filter((c) => c.customer_type === 'retail').length || 0;
   const wholesaleCount = customers?.filter((c) => c.customer_type === 'wholesale').length || 0;
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredCustomers?.length && filteredCustomers.length > 0) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredCustomers?.map(c => c.id)));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    deleteCustomersMutation.mutate([...selectedIds], {
+      onSuccess: () => {
+        toast.success(`${selectedIds.size} customer(s) deleted`);
+        setSelectedIds(new Set());
+        setIsDeleteDialogOpen(false);
+      },
+      onError: (error: Error) => {
+        toast.error(error.message);
+      },
+    });
+  };
+
+  const handleExport = () => {
+    const customersToExport = selectedIds.size > 0
+      ? customers?.filter(c => selectedIds.has(c.id))
+      : customers;
+    
+    if (!customersToExport?.length) return;
+    
+    exportToCSV(customersToExport, 'customers', [
+      { key: 'name', header: 'Name' },
+      { key: 'customer_type', header: 'Type' },
+      { key: 'email', header: 'Email' },
+      { key: 'phone', header: 'Phone' },
+      { key: 'address', header: 'Address' },
+      { key: 'notes', header: 'Notes' },
+    ]);
+    
+    toast.success(`Exported ${customersToExport.length} customer(s)`);
+  };
 
   const CustomerFormFields = ({ formInstance }: { formInstance: typeof form }) => (
     <>
@@ -274,45 +338,51 @@ export default function Customers() {
           <p className="text-muted-foreground">Manage your customer database</p>
         </div>
         
-        <Dialog open={isDialogOpen} onOpenChange={(open) => {
-          setIsDialogOpen(open);
-          if (!open) form.reset();
-        }}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Customer
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>Add New Customer</DialogTitle>
-              <DialogDescription>
-                Create a new customer record for orders.
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
-                <CustomerFormFields formInstance={form} />
-                <div className="flex justify-end gap-3 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={createCustomerMutation.isPending}>
-                    {createCustomerMutation.isPending ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Creating...
-                      </>
-                    ) : (
-                      'Create Customer'
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExport}>
+            <Download className="w-4 h-4 mr-2" />
+            Export
+          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={(open) => {
+            setIsDialogOpen(open);
+            if (!open) form.reset();
+          }}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Customer
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>Add New Customer</DialogTitle>
+                <DialogDescription>
+                  Create a new customer record for orders.
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+                  <CustomerFormFields formInstance={form} />
+                  <div className="flex justify-end gap-3 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={createCustomerMutation.isPending}>
+                      {createCustomerMutation.isPending ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Creating...
+                        </>
+                      ) : (
+                        'Create Customer'
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Edit Dialog */}
@@ -353,6 +423,28 @@ export default function Customers() {
         </DialogContent>
       </Dialog>
 
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {selectedIds.size} customer(s)?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the 
+              selected customers and remove their data from the system.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteCustomersMutation.isPending ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card>
@@ -382,6 +474,34 @@ export default function Customers() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Bulk Action Bar */}
+      {isAdmin && selectedIds.size > 0 && (
+        <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+          <span className="text-sm font-medium">
+            {selectedIds.size} selected
+          </span>
+          <Button variant="outline" size="sm" onClick={handleExport}>
+            <Download className="w-4 h-4 mr-2" />
+            Export
+          </Button>
+          <Button 
+            variant="destructive" 
+            size="sm" 
+            onClick={() => setIsDeleteDialogOpen(true)}
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Delete
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setSelectedIds(new Set())}
+          >
+            Clear
+          </Button>
+        </div>
+      )}
 
       {/* Customer List */}
       <Card>
@@ -416,6 +536,14 @@ export default function Customers() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    {isAdmin && (
+                      <TableHead className="w-[40px]">
+                        <Checkbox
+                          checked={selectedIds.size === filteredCustomers.length && filteredCustomers.length > 0}
+                          onCheckedChange={toggleSelectAll}
+                        />
+                      </TableHead>
+                    )}
                     <TableHead>Name</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Contact</TableHead>
@@ -426,6 +554,14 @@ export default function Customers() {
                 <TableBody>
                   {filteredCustomers.map((customer) => (
                     <TableRow key={customer.id}>
+                      {isAdmin && (
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedIds.has(customer.id)}
+                            onCheckedChange={() => toggleSelect(customer.id)}
+                          />
+                        </TableCell>
+                      )}
                       <TableCell className="font-medium">{customer.name}</TableCell>
                       <TableCell>
                         <Badge variant={customer.customer_type === 'wholesale' ? 'default' : 'secondary'}>
