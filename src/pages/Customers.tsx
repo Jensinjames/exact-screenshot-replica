@@ -3,7 +3,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/integrations/supabase/client';
-import { useCustomers } from '@/hooks/customers';
+import { useCustomers, useUpdateCustomer } from '@/hooks/customers';
+import { useIsAdmin } from '@/hooks/team/useIsAdmin';
 import { customerSchema, type CustomerFormData } from '@/schemas';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -42,16 +43,41 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { toast } from 'sonner';
-import { Plus, Search, User, Building2, Loader2 } from 'lucide-react';
+import { Plus, Search, User, Building2, Loader2, Pencil } from 'lucide-react';
+
+type Customer = {
+  id: string;
+  name: string;
+  customer_type: 'retail' | 'wholesale';
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  notes: string | null;
+};
 
 export default function Customers() {
   const { data: customers, isLoading } = useCustomers();
   const queryClient = useQueryClient();
+  const { isAdmin } = useIsAdmin();
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
 
   const form = useForm<CustomerFormData>({
+    resolver: zodResolver(customerSchema),
+    defaultValues: {
+      name: '',
+      customerType: 'retail',
+      email: '',
+      phone: '',
+      address: '',
+      notes: '',
+    },
+  });
+
+  const editForm = useForm<CustomerFormData>({
     resolver: zodResolver(customerSchema),
     defaultValues: {
       name: '',
@@ -87,8 +113,41 @@ export default function Customers() {
     },
   });
 
+  const updateCustomerMutation = useUpdateCustomer();
+
   const onSubmit = (data: CustomerFormData) => {
     createCustomerMutation.mutate(data);
+  };
+
+  const handleEdit = (customer: Customer) => {
+    setEditingCustomer(customer);
+    editForm.reset({
+      name: customer.name,
+      customerType: customer.customer_type,
+      email: customer.email || '',
+      phone: customer.phone || '',
+      address: customer.address || '',
+      notes: customer.notes || '',
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const onEditSubmit = (data: CustomerFormData) => {
+    if (!editingCustomer) return;
+    updateCustomerMutation.mutate(
+      { id: editingCustomer.id, data },
+      {
+        onSuccess: () => {
+          toast.success('Customer updated successfully!');
+          setIsEditDialogOpen(false);
+          setEditingCustomer(null);
+          editForm.reset();
+        },
+        onError: (error: Error) => {
+          toast.error(error.message);
+        },
+      }
+    );
   };
 
   const filteredCustomers = customers?.filter((customer) => {
@@ -104,6 +163,108 @@ export default function Customers() {
 
   const retailCount = customers?.filter((c) => c.customer_type === 'retail').length || 0;
   const wholesaleCount = customers?.filter((c) => c.customer_type === 'wholesale').length || 0;
+
+  const CustomerFormFields = ({ formInstance }: { formInstance: typeof form }) => (
+    <>
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          control={formInstance.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name *</FormLabel>
+              <FormControl>
+                <Input placeholder="Customer name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={formInstance.control}
+          name="customerType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Type</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="retail">Retail</SelectItem>
+                  <SelectItem value="wholesale">Wholesale</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <FormField
+          control={formInstance.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="email@example.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={formInstance.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Phone</FormLabel>
+              <FormControl>
+                <Input placeholder="(555) 123-4567" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
+      <FormField
+        control={formInstance.control}
+        name="address"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Address</FormLabel>
+            <FormControl>
+              <Input placeholder="Street address, city, state" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={formInstance.control}
+        name="notes"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Notes</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Special instructions, preferences, etc."
+                rows={3}
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </>
+  );
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -132,104 +293,7 @@ export default function Customers() {
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Customer name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="customerType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Type</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="retail">Retail</SelectItem>
-                            <SelectItem value="wholesale">Wholesale</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input type="email" placeholder="email@example.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone</FormLabel>
-                        <FormControl>
-                          <Input placeholder="(555) 123-4567" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Address</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Street address, city, state" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Notes</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Special instructions, preferences, etc."
-                          rows={3}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
+                <CustomerFormFields formInstance={form} />
                 <div className="flex justify-end gap-3 pt-4">
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                     Cancel
@@ -250,6 +314,44 @@ export default function Customers() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={(open) => {
+        setIsEditDialogOpen(open);
+        if (!open) {
+          setEditingCustomer(null);
+          editForm.reset();
+        }
+      }}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Edit Customer</DialogTitle>
+            <DialogDescription>
+              Update customer information.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...editForm}>
+            <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4 mt-4">
+              <CustomerFormFields formInstance={editForm} />
+              <div className="flex justify-end gap-3 pt-4">
+                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={updateCustomerMutation.isPending}>
+                  {updateCustomerMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Changes'
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -318,6 +420,7 @@ export default function Customers() {
                     <TableHead>Type</TableHead>
                     <TableHead>Contact</TableHead>
                     <TableHead>Address</TableHead>
+                    {isAdmin && <TableHead className="w-[60px]">Actions</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -339,6 +442,17 @@ export default function Customers() {
                       <TableCell className="max-w-[200px] truncate">
                         {customer.address || <span className="text-muted-foreground">—</span>}
                       </TableCell>
+                      {isAdmin && (
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEdit(customer as Customer)}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>
