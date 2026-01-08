@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useCustomers } from '@/hooks/customers';
-import type { Customer, CustomerType } from '@/types';
+import { customerSchema, type CustomerFormData } from '@/schemas';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -33,6 +33,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { toast } from 'sonner';
 import { Plus, Search, User, Building2, Loader2 } from 'lucide-react';
 
@@ -42,35 +50,28 @@ export default function Customers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
-  // Form state
-  const [name, setName] = useState('');
-  const [customerType, setCustomerType] = useState<CustomerType>('retail');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [notes, setNotes] = useState('');
 
-  const resetForm = () => {
-    setName('');
-    setCustomerType('retail');
-    setEmail('');
-    setPhone('');
-    setAddress('');
-    setNotes('');
-  };
+  const form = useForm<CustomerFormData>({
+    resolver: zodResolver(customerSchema),
+    defaultValues: {
+      name: '',
+      customerType: 'retail',
+      email: '',
+      phone: '',
+      address: '',
+      notes: '',
+    },
+  });
 
   const createCustomerMutation = useMutation({
-    mutationFn: async () => {
-      if (!name.trim()) throw new Error('Please enter a customer name');
-
+    mutationFn: async (data: CustomerFormData) => {
       const { error } = await supabase.from('customers').insert({
-        name: name.trim(),
-        customer_type: customerType,
-        email: email.trim() || null,
-        phone: phone.trim() || null,
-        address: address.trim() || null,
-        notes: notes.trim() || null,
+        name: data.name,
+        customer_type: data.customerType,
+        email: data.email || null,
+        phone: data.phone || null,
+        address: data.address || null,
+        notes: data.notes || null,
       });
 
       if (error) throw error;
@@ -79,12 +80,16 @@ export default function Customers() {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       toast.success('Customer created successfully!');
       setIsDialogOpen(false);
-      resetForm();
+      form.reset();
     },
     onError: (error: Error) => {
       toast.error(error.message);
     },
   });
+
+  const onSubmit = (data: CustomerFormData) => {
+    createCustomerMutation.mutate(data);
+  };
 
   const filteredCustomers = customers?.filter((customer) => {
     const matchesSearch =
@@ -108,7 +113,10 @@ export default function Customers() {
           <p className="text-muted-foreground">Manage your customer database</p>
         </div>
         
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) form.reset();
+        }}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="w-4 h-4 mr-2" />
@@ -122,97 +130,123 @@ export default function Customers() {
                 Create a new customer record for orders.
               </DialogDescription>
             </DialogHeader>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                createCustomerMutation.mutate();
-              }}
-              className="space-y-4 mt-4"
-            >
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Name *</Label>
-                  <Input
-                    id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Customer name"
-                    required
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Customer name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="customerType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Type</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="retail">Retail</SelectItem>
+                            <SelectItem value="wholesale">Wholesale</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="type">Type</Label>
-                  <Select value={customerType} onValueChange={(v) => setCustomerType(v as CustomerType)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="retail">Retail</SelectItem>
-                      <SelectItem value="wholesale">Wholesale</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="email@example.com"
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="email@example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone</FormLabel>
+                        <FormControl>
+                          <Input placeholder="(555) 123-4567" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="(555) 123-4567"
-                  />
-                </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
-                <Input
-                  id="address"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Street address, city, state"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="notes">Notes</Label>
-                <Textarea
-                  id="notes"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Special instructions, preferences, etc."
-                  rows={3}
-                />
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4">
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={createCustomerMutation.isPending}>
-                  {createCustomerMutation.isPending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Creating...
-                    </>
-                  ) : (
-                    'Create Customer'
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Address</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Street address, city, state" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </Button>
-              </div>
-            </form>
+                />
+
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notes</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Special instructions, preferences, etc."
+                          rows={3}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={createCustomerMutation.isPending}>
+                    {createCustomerMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Creating...
+                      </>
+                    ) : (
+                      'Create Customer'
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Form>
           </DialogContent>
         </Dialog>
       </div>
