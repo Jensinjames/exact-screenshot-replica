@@ -60,7 +60,23 @@ export function useProfile() {
   const uploadAvatar = async (file: File): Promise<string | null> => {
     if (!user) return null;
 
-    const fileExt = file.name.split('.').pop();
+    // Validate MIME type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Only image files are allowed');
+      return null;
+    }
+
+    // Validate file extension with whitelist
+    const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    const fileExt = file.name.split('.').pop()?.toLowerCase();
+    
+    if (!fileExt || !allowedExtensions.includes(fileExt)) {
+      toast.error('Invalid file type', { 
+        description: 'Allowed formats: JPG, PNG, GIF, WEBP' 
+      });
+      return null;
+    }
+
     const fileName = `${user.id}/${Date.now()}.${fileExt}`;
 
     try {
