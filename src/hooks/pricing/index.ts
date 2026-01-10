@@ -13,3 +13,10 @@ export type { PricingInsights, PricingInsightsMutationParams } from './usePricin
 
 export { usePricingInsightsHistory, useDeletePricingInsight } from './usePricingInsightsHistory';
 export type { PricingInsightHistoryItem } from './usePricingInsightsHistory';
+
+export { usePricingSimulator } from './usePricingSimulator';
+export type {
+  SimulatedPrice,
+  SimulatorProductResult,
+  SimulatorResult,
+} from './usePricingSimulator';
