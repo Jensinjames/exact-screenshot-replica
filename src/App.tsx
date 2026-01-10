@@ -15,7 +15,10 @@ import NewOrder from "./pages/NewOrder";
 import OrderDetail from "./pages/OrderDetail";
 import Customers from "./pages/Customers";
 import Production from "./pages/Production";
+import ProductionRuns from "./pages/ProductionRuns";
+import ProductionRunDetail from "./pages/ProductionRunDetail";
 import Inventory from "./pages/Inventory";
+import Pricing from "./pages/Pricing";
 import Settings from "./pages/Settings";
 import Team from "./pages/Team";
 import NotFound from "./pages/NotFound";
@@ -95,11 +98,41 @@ const App = () => (
               }
             />
             <Route
+              path="/production-runs"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <ProductionRuns />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/production-runs/:id"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <ProductionRunDetail />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/inventory"
               element={
                 <ProtectedRoute>
                   <AppLayout>
                     <Inventory />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/pricing"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Pricing />
                   </AppLayout>
                 </ProtectedRoute>
               }
