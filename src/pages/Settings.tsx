@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Loader2, Upload, User } from 'lucide-react';
-import { PageLoader } from '@/components/ui/page-loader';
+import { LoadingState } from '@/components/ui/loading-state';
 
 export default function Settings() {
   const { profile, loading, updateProfile, uploadAvatar } = useProfile();
@@ -51,7 +51,7 @@ export default function Settings() {
   };
 
   if (loading) {
-    return <PageLoader />;
+    return <LoadingState size="full" />;
   }
 
   return (

@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { OrderStatusBadge } from './OrderStatusBadge';
-import { PageLoader } from '@/components/ui/page-loader';
+import { LoadingState } from '@/components/ui/loading-state';
 import { EmptyState } from '@/components/ui/empty-state';
 import type { OrderStatus } from '@/types';
 
@@ -30,7 +30,7 @@ interface OrderTableProps {
 
 export function OrderTable({ orders, isLoading }: OrderTableProps) {
   if (isLoading) {
-    return <PageLoader message="Loading orders..." />;
+    return <LoadingState message="Loading orders..." size="lg" />;
   }
 
   if (!orders || orders.length === 0) {

@@ -1,6 +1,6 @@
 import { Factory, DollarSign, Package } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { LoadingState } from '@/components/ui/loading-state';
 import { formatCurrency } from '@/utils/formatters';
 
 interface ProductionRunsStatsProps {
@@ -27,7 +27,7 @@ export function ProductionRunsStats({
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <Skeleton className="h-8 w-16" />
+            <LoadingState variant="skeleton" skeletonType="stat" />
           ) : (
             <div className="text-2xl font-bold">{totalRuns}</div>
           )}
@@ -41,7 +41,7 @@ export function ProductionRunsStats({
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <Skeleton className="h-8 w-16" />
+            <LoadingState variant="skeleton" skeletonType="stat" />
           ) : (
             <div className="text-2xl font-bold">{totalDoughs}</div>
           )}
@@ -55,7 +55,7 @@ export function ProductionRunsStats({
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <Skeleton className="h-8 w-16" />
+            <LoadingState variant="skeleton" skeletonType="stat" />
           ) : (
             <div className="text-2xl font-bold">{totalCakes}</div>
           )}
@@ -69,7 +69,7 @@ export function ProductionRunsStats({
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <Skeleton className="h-8 w-24" />
+            <LoadingState variant="skeleton" skeletonType="stat" className="w-24" />
           ) : (
             <div className="text-2xl font-bold">{formatCurrency(totalCosts)}</div>
           )}

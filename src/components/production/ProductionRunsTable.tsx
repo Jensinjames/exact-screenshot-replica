@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { PageLoader } from '@/components/ui/page-loader';
+import { LoadingState } from '@/components/ui/loading-state';
 import { EmptyState } from '@/components/ui/empty-state';
 import { formatCurrency } from '@/utils/formatters';
 
@@ -43,7 +43,7 @@ export function ProductionRunsTable({ runs, isLoading }: ProductionRunsTableProp
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <PageLoader />
+          <LoadingState />
         ) : runs.length > 0 ? (
           <Table>
             <TableHeader>

@@ -1,6 +1,11 @@
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/**
+ * @deprecated Use LoadingState component instead
+ * <LoadingState size="full" /> for full screen
+ * <LoadingState size="lg" /> for container-level
+ */
 interface PageLoaderProps {
   /** Full screen loader (for auth redirects) */
   fullScreen?: boolean;
