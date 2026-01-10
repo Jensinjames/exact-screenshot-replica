@@ -25,6 +25,7 @@ import { toast } from 'sonner';
 import { Plus, Search, Download } from 'lucide-react';
 import { exportToCSV } from '@/utils/export';
 import { LoadingState } from '@/components/ui/loading-state';
+import { PageHeader } from '@/components/ui/page-header';
 import {
   CustomerFormDialog,
   CustomerTable,
@@ -120,23 +121,22 @@ export default function Customers() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-display font-bold">Customers</h1>
-          <p className="text-muted-foreground">Manage your customer database</p>
-        </div>
-        
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExport}>
-            <Download className="w-4 h-4 mr-2" />
-            Export
-          </Button>
-          <Button onClick={() => setIsDialogOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Customer
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Customers"
+        description="Manage your customer database"
+        actions={
+          <>
+            <Button variant="outline" onClick={handleExport}>
+              <Download className="w-4 h-4 mr-2" />
+              Export
+            </Button>
+            <Button onClick={() => setIsDialogOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Customer
+            </Button>
+          </>
+        }
+      />
 
       {/* Create Dialog */}
       <CustomerFormDialog

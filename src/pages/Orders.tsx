@@ -4,6 +4,7 @@ import { useOrders } from '@/hooks/orders';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { PageHeader } from '@/components/ui/page-header';
 import { OrderFilters, OrderTable, OrderStats } from '@/components/orders';
 
 export default function Orders() {
@@ -23,18 +24,18 @@ export default function Orders() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-display font-bold">Orders</h1>
-          <p className="text-muted-foreground">Manage all customer orders</p>
-        </div>
-        <Button asChild>
-          <Link to="/orders/new">
-            <Plus className="w-4 h-4 mr-2" />
-            New Order
-          </Link>
-        </Button>
-      </div>
+      <PageHeader
+        title="Orders"
+        description="Manage all customer orders"
+        actions={
+          <Button asChild>
+            <Link to="/orders/new">
+              <Plus className="w-4 h-4 mr-2" />
+              New Order
+            </Link>
+          </Button>
+        }
+      />
 
       <OrderStats orders={orders || []} />
 

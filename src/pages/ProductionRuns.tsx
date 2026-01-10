@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/ui/page-header';
 import { useProductionRuns } from '@/hooks/production/useProductionRuns';
 import {
   CreateRunDialog,
@@ -38,18 +39,16 @@ export default function ProductionRuns() {
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Production Runs</h1>
-          <p className="text-muted-foreground">
-            Track production batches, costs, and outputs
-          </p>
-        </div>
-        <Button onClick={() => setIsCreateOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Run
-        </Button>
-      </div>
+      <PageHeader
+        title="Production Runs"
+        description="Track production batches, costs, and outputs"
+        actions={
+          <Button onClick={() => setIsCreateOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Run
+          </Button>
+        }
+      />
 
       <ProductionRunsStats
         totalRuns={totalRuns}

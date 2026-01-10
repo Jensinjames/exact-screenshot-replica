@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useProductionPlan } from '@/hooks/production';
 import { useProducts } from '@/hooks/products';
+import { PageHeader } from '@/components/ui/page-header';
 import type { CakeSize, CakeVariety } from '@/types';
 import {
   DateNavigation,
@@ -60,20 +61,16 @@ export default function Production() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Header with Date Navigation */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-display font-bold">Production Plan</h1>
-          <p className="text-muted-foreground">
-            Daily production planning based on orders
-          </p>
-        </div>
-
-        <DateNavigation
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
-        />
-      </div>
+      <PageHeader
+        title="Production Plan"
+        description="Daily production planning based on orders"
+        actions={
+          <DateNavigation
+            selectedDate={selectedDate}
+            onDateChange={setSelectedDate}
+          />
+        }
+      />
 
       <ProductionPlanStats
         totalCakes={totalCakes}

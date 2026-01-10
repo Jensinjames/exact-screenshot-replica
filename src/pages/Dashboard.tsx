@@ -1,7 +1,11 @@
+import { Link } from 'react-router-dom';
+import { format } from 'date-fns';
+import { Plus, Calendar } from 'lucide-react';
 import { useDashboardStats } from '@/hooks/dashboard';
 import { LoadingState } from '@/components/ui/loading-state';
+import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/ui/page-header';
 import {
-  DashboardHeader,
   DashboardStats,
   RecentOrdersList,
   InventoryAlerts,
@@ -16,7 +20,26 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <DashboardHeader currentDate={new Date()} />
+      <PageHeader
+        title="Dashboard"
+        description={format(new Date(), 'EEEE, MMMM d, yyyy')}
+        actions={
+          <>
+            <Button asChild>
+              <Link to="/orders/new">
+                <Plus className="w-4 h-4 mr-2" />
+                New Order
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/production">
+                <Calendar className="w-4 h-4 mr-2" />
+                Today's Plan
+              </Link>
+            </Button>
+          </>
+        }
+      />
 
       <DashboardStats
         todayOrdersCount={stats?.todayOrdersCount || 0}
