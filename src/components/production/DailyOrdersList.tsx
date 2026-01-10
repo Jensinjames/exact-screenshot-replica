@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { PageLoader } from '@/components/ui/page-loader';
+import { LoadingState } from '@/components/ui/loading-state';
 import { EmptyState } from '@/components/ui/empty-state';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 
@@ -37,7 +37,7 @@ export function DailyOrdersList({ orders, selectedDate, isLoading }: DailyOrders
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <PageLoader />
+          <LoadingState />
         ) : orders.length > 0 ? (
           <div className="space-y-3">
             {orders.map((order) => (

@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { PageLoader } from '@/components/ui/page-loader';
+import { LoadingState } from '@/components/ui/loading-state';
 import { EmptyState } from '@/components/ui/empty-state';
 import type { CakeSize, CakeVariety } from '@/types';
 
@@ -41,7 +41,7 @@ export function ProductionBreakdown({
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <PageLoader />
+          <LoadingState />
         ) : summary.length > 0 ? (
           <Table>
             <TableHeader>

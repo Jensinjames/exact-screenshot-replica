@@ -24,7 +24,7 @@ import {
 import { toast } from 'sonner';
 import { Plus, Search, Download } from 'lucide-react';
 import { exportToCSV } from '@/utils/export';
-import { PageLoader } from '@/components/ui/page-loader';
+import { LoadingState } from '@/components/ui/loading-state';
 import {
   CustomerFormDialog,
   CustomerTable,
@@ -115,7 +115,7 @@ export default function Customers() {
   };
 
   if (isLoading) {
-    return <PageLoader message="Loading customers..." />;
+    return <LoadingState size="full" message="Loading customers..." />;
   }
 
   return (

@@ -1,5 +1,5 @@
 import { useDashboardStats } from '@/hooks/dashboard';
-import { PageLoader } from '@/components/ui/page-loader';
+import { LoadingState } from '@/components/ui/loading-state';
 import {
   DashboardHeader,
   DashboardStats,
@@ -11,7 +11,7 @@ export default function Dashboard() {
   const { data: stats, isLoading } = useDashboardStats();
 
   if (isLoading) {
-    return <PageLoader message="Loading dashboard..." />;
+    return <LoadingState size="full" message="Loading dashboard..." />;
   }
 
   return (
