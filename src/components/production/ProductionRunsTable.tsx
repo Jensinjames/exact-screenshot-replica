@@ -12,6 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { PageLoader } from '@/components/ui/page-loader';
+import { EmptyState } from '@/components/ui/empty-state';
 import { formatCurrency } from '@/utils/formatters';
 
 interface ProductionRunOutput {
@@ -94,11 +95,11 @@ export function ProductionRunsTable({ runs, isLoading }: ProductionRunsTableProp
             </TableBody>
           </Table>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            <Factory className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>No production runs yet</p>
-            <p className="text-sm">Click "New Run" to record your first production batch</p>
-          </div>
+          <EmptyState
+            icon={Factory}
+            title="No production runs yet"
+            description="Click 'New Run' to record your first production batch"
+          />
         )}
       </CardContent>
     </Card>

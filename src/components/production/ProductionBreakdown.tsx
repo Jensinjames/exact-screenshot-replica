@@ -1,7 +1,5 @@
-import { Link } from 'react-router-dom';
 import { ShoppingCart } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Table,
@@ -12,6 +10,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { PageLoader } from '@/components/ui/page-loader';
+import { EmptyState } from '@/components/ui/empty-state';
 import type { CakeSize, CakeVariety } from '@/types';
 
 interface ProductionSummaryItem {
@@ -74,13 +73,15 @@ export function ProductionBreakdown({
             </TableBody>
           </Table>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            <ShoppingCart className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>No orders for this date</p>
-            <Button variant="link" asChild className="mt-2">
-              <Link to="/orders/new">Create an order</Link>
-            </Button>
-          </div>
+          <EmptyState
+            icon={ShoppingCart}
+            title="No orders for this date"
+            action={{
+              label: "Create an order",
+              href: "/orders/new",
+              variant: "link",
+            }}
+          />
         )}
       </CardContent>
     </Card>

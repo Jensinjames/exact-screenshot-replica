@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { ShoppingCart, ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
@@ -53,13 +54,15 @@ export function RecentOrdersList({ orders }: RecentOrdersListProps) {
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            <ShoppingCart className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>No recent orders</p>
-            <Button variant="link" asChild className="mt-2">
-              <Link to="/orders/new">Create your first order</Link>
-            </Button>
-          </div>
+          <EmptyState
+            icon={ShoppingCart}
+            title="No recent orders"
+            action={{
+              label: "Create your first order",
+              href: "/orders/new",
+              variant: "link",
+            }}
+          />
         )}
       </CardContent>
     </Card>

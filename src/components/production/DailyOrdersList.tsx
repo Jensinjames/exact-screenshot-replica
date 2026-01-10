@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { PageLoader } from '@/components/ui/page-loader';
+import { EmptyState } from '@/components/ui/empty-state';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
 
 interface OrderItem {
@@ -66,9 +67,7 @@ export function DailyOrdersList({ orders, selectedDate, isLoading }: DailyOrders
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            <p>No orders scheduled</p>
-          </div>
+          <EmptyState title="No orders scheduled" />
         )}
       </CardContent>
     </Card>

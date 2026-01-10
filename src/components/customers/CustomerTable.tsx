@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Pencil, User, Plus } from 'lucide-react';
 import type { Customer } from '@/types';
 
@@ -33,14 +34,16 @@ export function CustomerTable({
 }: CustomerTableProps) {
   if (customers.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
-        <User className="w-12 h-12 mx-auto mb-3 opacity-50" />
-        <p className="mb-4">No customers found</p>
-        <Button onClick={onAddNew}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add your first customer
-        </Button>
-      </div>
+      <EmptyState
+        icon={User}
+        title="No customers found"
+        action={{
+          label: "Add your first customer",
+          onClick: onAddNew,
+          icon: Plus,
+        }}
+        size="lg"
+      />
     );
   }
 
