@@ -3,6 +3,7 @@ import { DollarSign, TrendingUp, ShoppingCart, Package } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatsCard } from '@/components/ui/stats-card';
+import { PageHeader } from '@/components/ui/page-header';
 import { usePricingAnalytics } from '@/hooks/pricing';
 import { RevenueByTypeChart } from '@/components/pricing/RevenueByTypeChart';
 import { RevenueByProductChart } from '@/components/pricing/RevenueByProductChart';
@@ -41,19 +42,17 @@ export default function Pricing() {
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Pricing Analytics</h1>
-          <p className="text-muted-foreground">
-            Revenue breakdown, blended metrics, and opportunity cost analysis
-          </p>
-        </div>
-        <DateRangeFilter
-          startDate={startDate}
-          endDate={endDate}
-          onDateChange={handleDateChange}
-        />
-      </div>
+      <PageHeader
+        title="Pricing Analytics"
+        description="Revenue breakdown, blended metrics, and opportunity cost analysis"
+        actions={
+          <DateRangeFilter
+            startDate={startDate}
+            endDate={endDate}
+            onDateChange={handleDateChange}
+          />
+        }
+      />
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">

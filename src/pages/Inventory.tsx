@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { EmptyState } from '@/components/ui/empty-state';
+import { PageHeader } from '@/components/ui/page-header';
 import { Plus, Search, Package, AlertTriangle, Loader2 } from 'lucide-react';
 
 export default function Inventory() {
@@ -130,24 +131,24 @@ export default function Inventory() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-display font-bold">Inventory</h1>
-          <p className="text-muted-foreground">Track your ingredient stock levels</p>
-        </div>
+      <PageHeader
+        title="Inventory"
+        description="Track your ingredient stock levels"
+        actions={
+          <Button onClick={() => setIsAddDialogOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Item
+          </Button>
+        }
+      />
 
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Item
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[400px]">
-            <DialogHeader>
-              <DialogTitle>Add Inventory Item</DialogTitle>
-              <DialogDescription>Add a new ingredient or supply to track.</DialogDescription>
-            </DialogHeader>
+      {/* Add Item Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Add Inventory Item</DialogTitle>
+            <DialogDescription>Add a new ingredient or supply to track.</DialogDescription>
+          </DialogHeader>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -229,8 +230,7 @@ export default function Inventory() {
               </div>
             </form>
           </DialogContent>
-        </Dialog>
-      </div>
+      </Dialog>
 
       {/* Low Stock Alert */}
       {lowStockItems.length > 0 && (

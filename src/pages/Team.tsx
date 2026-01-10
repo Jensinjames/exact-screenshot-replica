@@ -2,6 +2,7 @@ import { useTeamMembers, useTeamInvitations } from '@/hooks/team';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingState } from '@/components/ui/loading-state';
+import { PageHeader } from '@/components/ui/page-header';
 import TeamMembersList from '@/components/team/TeamMembersList';
 import PendingInvitationsList from '@/components/team/PendingInvitationsList';
 import InviteTeamMemberDialog from '@/components/team/InviteTeamMemberDialog';
@@ -19,13 +20,11 @@ export default function Team() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-display font-bold">Team Management</h1>
-          <p className="text-muted-foreground">Manage your team members and invitations</p>
-        </div>
-        <InviteTeamMemberDialog onInvite={inviteMember} />
-      </div>
+      <PageHeader
+        title="Team Management"
+        description="Manage your team members and invitations"
+        actions={<InviteTeamMemberDialog onInvite={inviteMember} />}
+      />
 
       <Card>
         <CardHeader>

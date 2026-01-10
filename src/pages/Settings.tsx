@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Loader2, Upload, User } from 'lucide-react';
 import { LoadingState } from '@/components/ui/loading-state';
+import { PageHeader } from '@/components/ui/page-header';
 
 export default function Settings() {
   const { profile, loading, updateProfile, uploadAvatar } = useProfile();
@@ -56,10 +57,10 @@ export default function Settings() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-display font-bold">Settings</h1>
-        <p className="text-muted-foreground">Manage your profile and preferences</p>
-      </div>
+      <PageHeader
+        title="Settings"
+        description="Manage your profile and preferences"
+      />
 
       <Card>
         <CardHeader>
