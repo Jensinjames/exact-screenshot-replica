@@ -4,8 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import AppLayout from "@/components/layout/AppLayout";
+import ProtectedLayout from "@/components/layout/ProtectedLayout";
+import AdminRoute from "@/components/AdminRoute";
 
 // Pages
 import Auth from "./pages/Auth";
@@ -22,7 +22,6 @@ import Pricing from "./pages/Pricing";
 import Settings from "./pages/Settings";
 import Team from "./pages/Team";
 import NotFound from "./pages/NotFound";
-import AdminRoute from "@/components/AdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -36,129 +35,21 @@ const App = () => (
           <Routes>
             <Route path="/auth" element={<Auth />} />
             
-            {/* Protected Routes */}
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <Dashboard />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/orders"
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <Orders />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/orders/new"
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <NewOrder />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/orders/:id"
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <OrderDetail />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/customers"
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <Customers />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/production"
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <Production />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/production-runs"
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <ProductionRuns />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/production-runs/:id"
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <ProductionRunDetail />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/inventory"
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <Inventory />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/pricing"
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <Pricing />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <Settings />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/team"
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <AdminRoute>
-                      <Team />
-                    </AdminRoute>
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
+            {/* Protected Routes with Layout */}
+            <Route element={<ProtectedLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="orders" element={<Orders />} />
+              <Route path="orders/new" element={<NewOrder />} />
+              <Route path="orders/:id" element={<OrderDetail />} />
+              <Route path="customers" element={<Customers />} />
+              <Route path="production" element={<Production />} />
+              <Route path="production-runs" element={<ProductionRuns />} />
+              <Route path="production-runs/:id" element={<ProductionRunDetail />} />
+              <Route path="inventory" element={<Inventory />} />
+              <Route path="pricing" element={<Pricing />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="team" element={<AdminRoute><Team /></AdminRoute>} />
+            </Route>
             
             {/* Catch-all */}
             <Route path="*" element={<NotFound />} />

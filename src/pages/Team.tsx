@@ -1,7 +1,7 @@
 import { useTeamMembers, useTeamInvitations } from '@/hooks/team';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
+import { PageLoader } from '@/components/ui/page-loader';
 import TeamMembersList from '@/components/team/TeamMembersList';
 import PendingInvitationsList from '@/components/team/PendingInvitationsList';
 import InviteTeamMemberDialog from '@/components/team/InviteTeamMemberDialog';
@@ -14,11 +14,7 @@ export default function Team() {
   const loading = membersLoading || invitationsLoading;
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (

@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useIsAdmin } from '@/hooks/team';
-import { Loader2 } from 'lucide-react';
+import { PageLoader } from '@/components/ui/page-loader';
 
 interface AdminRouteProps {
   children: ReactNode;
@@ -11,11 +11,7 @@ export default function AdminRoute({ children }: AdminRouteProps) {
   const { isAdmin, loading } = useIsAdmin();
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (!isAdmin) {
