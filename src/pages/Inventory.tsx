@@ -25,7 +25,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { Plus, Search, Package, AlertTriangle, Loader2, Minus } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Plus, Search, Package, AlertTriangle, Loader2 } from 'lucide-react';
 
 export default function Inventory() {
   const { data: inventory, isLoading } = useInventory();
@@ -337,14 +338,16 @@ export default function Inventory() {
               </Table>
             </div>
           ) : (
-            <div className="text-center py-12 text-muted-foreground">
-              <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p className="mb-4">No inventory items found</p>
-              <Button onClick={() => setIsAddDialogOpen(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Add your first item
-              </Button>
-            </div>
+            <EmptyState
+              icon={Package}
+              title="No inventory items found"
+              action={{
+                label: "Add your first item",
+                onClick: () => setIsAddDialogOpen(true),
+                icon: Plus,
+              }}
+              size="lg"
+            />
           )}
         </CardContent>
       </Card>

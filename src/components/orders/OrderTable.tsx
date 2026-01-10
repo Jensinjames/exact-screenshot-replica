@@ -7,10 +7,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { PageLoader } from '@/components/ui/page-loader';
+import { EmptyState } from '@/components/ui/empty-state';
 import type { OrderStatus } from '@/types';
 
 interface Order {
@@ -35,12 +35,14 @@ export function OrderTable({ orders, isLoading }: OrderTableProps) {
 
   if (!orders || orders.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
-        <p className="mb-4">No orders found</p>
-        <Button asChild>
-          <Link to="/orders/new">Create your first order</Link>
-        </Button>
-      </div>
+      <EmptyState
+        title="No orders found"
+        action={{
+          label: "Create your first order",
+          href: "/orders/new",
+        }}
+        size="lg"
+      />
     );
   }
 

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { EmptyState } from '@/components/ui/empty-state';
 import { AlertTriangle, ArrowRight } from 'lucide-react';
 import type { Inventory } from '@/types';
 
@@ -45,10 +46,10 @@ export function InventoryAlerts({ items }: InventoryAlertsProps) {
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
-            <AlertTriangle className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>All inventory levels are good!</p>
-          </div>
+          <EmptyState
+            icon={AlertTriangle}
+            title="All inventory levels are good!"
+          />
         )}
       </CardContent>
     </Card>
