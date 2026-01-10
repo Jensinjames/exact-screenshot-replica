@@ -1,1 +1,4 @@
 project_id = "scgdhuttgvulhwdfmyar"
+
+[functions.pricing-insights]
+verify_jwt = true
