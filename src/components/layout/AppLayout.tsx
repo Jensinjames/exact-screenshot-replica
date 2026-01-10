@@ -29,7 +29,10 @@ import {
   LogOut,
   Settings,
   UserCog,
+  DollarSign,
+  Factory,
 } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 
 interface AppLayoutProps {
@@ -41,7 +44,9 @@ const menuItems = [
   { title: 'Orders', icon: ShoppingCart, path: '/orders' },
   { title: 'Customers', icon: Users, path: '/customers' },
   { title: 'Production', icon: Calendar, path: '/production' },
+  { title: 'Production Runs', icon: Factory, path: '/production-runs' },
   { title: 'Inventory', icon: Package, path: '/inventory' },
+  { title: 'Pricing', icon: DollarSign, path: '/pricing' },
 ];
 
 export default function AppLayout({ children }: AppLayoutProps) {

@@ -220,6 +220,83 @@ export type Database = {
         }
         Relationships: []
       }
+      production_run_outputs: {
+        Row: {
+          created_at: string
+          id: string
+          quantity_produced: number
+          quantity_sold: number
+          run_id: string
+          size: Database["public"]["Enums"]["cake_size"]
+          variety: Database["public"]["Enums"]["cake_variety"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          quantity_produced?: number
+          quantity_sold?: number
+          run_id: string
+          size: Database["public"]["Enums"]["cake_size"]
+          variety: Database["public"]["Enums"]["cake_variety"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          quantity_produced?: number
+          quantity_sold?: number
+          run_id?: string
+          size?: Database["public"]["Enums"]["cake_size"]
+          variety?: Database["public"]["Enums"]["cake_variety"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "production_run_outputs_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "production_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      production_runs: {
+        Row: {
+          batch_number: string
+          created_at: string
+          created_by: string | null
+          doughs_produced: number
+          id: string
+          ingredient_cost: number | null
+          labor_cost: number | null
+          notes: string | null
+          run_date: string
+          updated_at: string
+        }
+        Insert: {
+          batch_number: string
+          created_at?: string
+          created_by?: string | null
+          doughs_produced?: number
+          id?: string
+          ingredient_cost?: number | null
+          labor_cost?: number | null
+          notes?: string | null
+          run_date: string
+          updated_at?: string
+        }
+        Update: {
+          batch_number?: string
+          created_at?: string
+          created_by?: string | null
+          doughs_produced?: number
+          id?: string
+          ingredient_cost?: number | null
+          labor_cost?: number | null
+          notes?: string | null
+          run_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           created_at: string
