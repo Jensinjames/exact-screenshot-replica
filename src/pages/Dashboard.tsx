@@ -14,21 +14,13 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge';
+import { PageLoader } from '@/components/ui/page-loader';
 
 export default function Dashboard() {
   const { data: stats, isLoading } = useDashboardStats();
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-display font-bold">Dashboard</h1>
-            <p className="text-muted-foreground">Loading...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <PageLoader message="Loading dashboard..." />;
   }
 
   return (
