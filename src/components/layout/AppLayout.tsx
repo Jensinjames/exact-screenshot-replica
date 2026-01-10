@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { getInitials } from '@/utils/formatters';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -59,16 +60,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const handleSignOut = async () => {
     await signOut();
     navigate('/auth');
-  };
-
-  const getInitials = (name: string | null | undefined) => {
-    if (!name) return 'U';
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
   };
 
   return (
