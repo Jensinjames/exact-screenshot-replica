@@ -8,6 +8,7 @@ import { RevenueByProductChart } from '@/components/pricing/RevenueByProductChar
 import { BlendedPriceTable } from '@/components/pricing/BlendedPriceTable';
 import { OpportunityCostCard } from '@/components/pricing/OpportunityCostCard';
 import { DateRangeFilter } from '@/components/pricing/DateRangeFilter';
+import { AIPricingInsightsCard } from '@/components/pricing/AIPricingInsightsCard';
 import { formatCurrency } from '@/utils/formatters';
 
 export default function Pricing() {
@@ -165,6 +166,9 @@ export default function Pricing() {
       ) : (
         <OpportunityCostCard data={data?.opportunityCosts || []} />
       )}
+
+      {/* AI Pricing Insights */}
+      <AIPricingInsightsCard analyticsData={data} isLoading={isLoading} />
     </div>
   );
 }
