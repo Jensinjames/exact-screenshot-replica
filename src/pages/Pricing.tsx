@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { DollarSign, TrendingUp, ShoppingCart, Package } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { StatsCard } from '@/components/ui/stats-card';
 import { usePricingAnalytics } from '@/hooks/pricing';
 import { RevenueByTypeChart } from '@/components/pricing/RevenueByTypeChart';
 import { RevenueByProductChart } from '@/components/pricing/RevenueByProductChart';
@@ -33,6 +34,11 @@ export default function Pricing() {
     );
   }
 
+  const avgOrderValue =
+    data && data.totalOrders > 0
+      ? formatCurrency(data.totalRevenue / data.totalOrders)
+      : '$0.00';
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -51,64 +57,34 @@ export default function Pricing() {
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-24" />
-            ) : (
-              <div className="text-2xl font-bold">
-                {formatCurrency(data?.totalRevenue || 0)}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-16" />
-            ) : (
-              <div className="text-2xl font-bold">{data?.totalOrders || 0}</div>
-            )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Units Sold</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-16" />
-            ) : (
-              <div className="text-2xl font-bold">{data?.totalQuantity || 0}</div>
-            )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Order Value</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-24" />
-            ) : (
-              <div className="text-2xl font-bold">
-                {data && data.totalOrders > 0
-                  ? formatCurrency(data.totalRevenue / data.totalOrders)
-                  : '$0.00'}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Total Revenue"
+          value={formatCurrency(data?.totalRevenue || 0)}
+          icon={DollarSign}
+          valueSize="sm"
+          isLoading={isLoading}
+        />
+        <StatsCard
+          title="Total Orders"
+          value={data?.totalOrders || 0}
+          icon={ShoppingCart}
+          valueSize="sm"
+          isLoading={isLoading}
+        />
+        <StatsCard
+          title="Units Sold"
+          value={data?.totalQuantity || 0}
+          icon={Package}
+          valueSize="sm"
+          isLoading={isLoading}
+        />
+        <StatsCard
+          title="Avg Order Value"
+          value={avgOrderValue}
+          icon={TrendingUp}
+          valueSize="sm"
+          isLoading={isLoading}
+        />
       </div>
 
       {/* Charts Row */}
@@ -169,15 +145,15 @@ export default function Pricing() {
       )}
 
       {/* Pricing Simulator */}
-      <PricingSimulator 
-        blendedPrices={data?.blendedPrices || []} 
-        isLoading={isLoading} 
+      <PricingSimulator
+        blendedPrices={data?.blendedPrices || []}
+        isLoading={isLoading}
       />
 
       {/* AI Pricing Insights */}
-      <AIPricingInsightsCard 
-        analyticsData={data} 
-        isLoading={isLoading} 
+      <AIPricingInsightsCard
+        analyticsData={data}
+        isLoading={isLoading}
         dateRangeStart={startDate}
         dateRangeEnd={endDate}
       />

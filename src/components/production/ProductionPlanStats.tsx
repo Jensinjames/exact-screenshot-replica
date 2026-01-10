@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { StatsCard } from '@/components/ui/stats-card';
 
 interface ProductionPlanStatsProps {
   totalCakes: number;
@@ -16,35 +16,25 @@ export function ProductionPlanStats({
 }: ProductionPlanStatsProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <Card className="gradient-primary text-primary-foreground">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium opacity-90">Total Cakes</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-4xl font-bold">{totalCakes}</div>
-          <p className="text-sm opacity-80 mt-1">for {format(selectedDate, 'MMM d')}</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Doughs Needed</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-4xl font-bold">{totalDoughs.toFixed(1)}</div>
-          <p className="text-sm text-muted-foreground mt-1">batches of dough</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Orders</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-4xl font-bold">{orderCount}</div>
-          <p className="text-sm text-muted-foreground mt-1">to fulfill</p>
-        </CardContent>
-      </Card>
+      <StatsCard
+        title="Total Cakes"
+        value={totalCakes}
+        description={`for ${format(selectedDate, 'MMM d')}`}
+        variant="primary"
+        valueSize="lg"
+      />
+      <StatsCard
+        title="Doughs Needed"
+        value={totalDoughs.toFixed(1)}
+        description="batches of dough"
+        valueSize="lg"
+      />
+      <StatsCard
+        title="Orders"
+        value={orderCount}
+        description="to fulfill"
+        valueSize="lg"
+      />
     </div>
   );
 }

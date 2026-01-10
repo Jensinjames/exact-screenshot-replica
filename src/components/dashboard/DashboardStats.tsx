@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShoppingCart, DollarSign, Clock, AlertTriangle } from 'lucide-react';
+import { StatsCard } from '@/components/ui/stats-card';
 
 interface DashboardStatsProps {
   todayOrdersCount: number;
@@ -16,67 +16,35 @@ export function DashboardStats({
 }: DashboardStatsProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card className="card-hover">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            Today's Orders
-          </CardTitle>
-          <ShoppingCart className="w-4 h-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">{todayOrdersCount}</div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Orders for pickup today
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card className="card-hover">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            Today's Revenue
-          </CardTitle>
-          <DollarSign className="w-4 h-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">
-            ${todayRevenue.toFixed(2)}
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            From today's orders
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card className="card-hover">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            Pending Orders
-          </CardTitle>
-          <Clock className="w-4 h-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">{pendingOrdersCount}</div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Awaiting fulfillment
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card className={`card-hover ${lowStockCount > 0 ? 'border-destructive/50' : ''}`}>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            Low Stock Items
-          </CardTitle>
-          <AlertTriangle className={`w-4 h-4 ${lowStockCount > 0 ? 'text-destructive' : 'text-muted-foreground'}`} />
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">{lowStockCount}</div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Items need restocking
-          </p>
-        </CardContent>
-      </Card>
+      <StatsCard
+        title="Today's Orders"
+        value={todayOrdersCount}
+        icon={ShoppingCart}
+        description="Orders for pickup today"
+        variant="hover"
+      />
+      <StatsCard
+        title="Today's Revenue"
+        value={`$${todayRevenue.toFixed(2)}`}
+        icon={DollarSign}
+        description="From today's orders"
+        variant="hover"
+      />
+      <StatsCard
+        title="Pending Orders"
+        value={pendingOrdersCount}
+        icon={Clock}
+        description="Awaiting fulfillment"
+        variant="hover"
+      />
+      <StatsCard
+        title="Low Stock Items"
+        value={lowStockCount}
+        icon={AlertTriangle}
+        description="Items need restocking"
+        variant={lowStockCount > 0 ? 'destructive' : 'hover'}
+        className={lowStockCount > 0 ? 'card-hover' : ''}
+      />
     </div>
   );
 }
