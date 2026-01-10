@@ -70,12 +70,37 @@ export interface PricingAnalytics {
   totalQuantity: number;
 }
 
-export function usePricingAnalytics() {
+export interface PricingAnalyticsParams {
+  startDate?: Date;
+  endDate?: Date;
+}
+
+export function usePricingAnalytics(params?: PricingAnalyticsParams) {
+  const { startDate, endDate } = params || {};
+
   return useQuery({
-    queryKey: ['pricing-analytics'],
+    queryKey: ['pricing-analytics', startDate?.toISOString(), endDate?.toISOString()],
     queryFn: async (): Promise<PricingAnalytics> => {
-      // Fetch order items with order data
-      const { data: orderItems, error: itemsError } = await supabase
+      // Fetch orders with optional date filters
+      let ordersQuery = supabase
+        .from('orders')
+        .select('id, customer_type, status, created_at');
+
+      if (startDate) {
+        ordersQuery = ordersQuery.gte('created_at', startDate.toISOString());
+      }
+      if (endDate) {
+        ordersQuery = ordersQuery.lte('created_at', endDate.toISOString());
+      }
+
+      const { data: orders, error: ordersError } = await ordersQuery;
+      if (ordersError) throw ordersError;
+
+      // Get order IDs within date range
+      const orderIds = orders?.map(o => o.id) || [];
+
+      // Fetch order items for filtered orders
+      let orderItemsQuery = supabase
         .from('order_items')
         .select(`
           id,
@@ -87,14 +112,25 @@ export function usePricingAnalytics() {
           order_id
         `);
 
+      // Only filter by order IDs if we have date filters
+      if (startDate || endDate) {
+        if (orderIds.length === 0) {
+          // No orders in range, return empty data
+          return {
+            revenueByType: [],
+            revenueByProduct: [],
+            blendedPrices: [],
+            opportunityCosts: [],
+            totalRevenue: 0,
+            totalOrders: 0,
+            totalQuantity: 0,
+          };
+        }
+        orderItemsQuery = orderItemsQuery.in('order_id', orderIds);
+      }
+
+      const { data: orderItems, error: itemsError } = await orderItemsQuery;
       if (itemsError) throw itemsError;
-
-      // Fetch orders for customer type info
-      const { data: orders, error: ordersError } = await supabase
-        .from('orders')
-        .select('id, customer_type, status');
-
-      if (ordersError) throw ordersError;
 
       // Create order lookup
       const orderLookup = new Map(orders?.map(o => [o.id, o]) || []);

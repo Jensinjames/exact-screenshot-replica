@@ -5,4 +5,5 @@ export type {
   BlendedPrice,
   OpportunityCost,
   PricingAnalytics,
+  PricingAnalyticsParams,
 } from './usePricingAnalytics';
