@@ -65,14 +65,19 @@ serve(async (req) => {
       );
     }
 
-    console.log('Authenticated user:', claimsData.claims.sub);
+    const userId = claimsData.claims.sub as string;
+    console.log('Authenticated user:', userId);
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    const { analyticsData } = await req.json() as { analyticsData: PricingAnalyticsInput };
+    const { analyticsData, dateRangeStart, dateRangeEnd } = await req.json() as { 
+      analyticsData: PricingAnalyticsInput;
+      dateRangeStart?: string;
+      dateRangeEnd?: string;
+    };
 
     if (!analyticsData) {
       return new Response(
@@ -234,6 +239,33 @@ Analyze this data and provide strategic pricing insights.`;
     }
 
     const insights = JSON.parse(toolCall.function.arguments);
+
+    // Save insights to history
+    const averageOrderValue = analyticsData.totalOrders > 0 
+      ? analyticsData.totalRevenue / analyticsData.totalOrders 
+      : 0;
+
+    const { error: insertError } = await supabase
+      .from('pricing_insights_history')
+      .insert({
+        created_by: userId,
+        date_range_start: dateRangeStart || null,
+        date_range_end: dateRangeEnd || null,
+        analytics_summary: {
+          totalRevenue: analyticsData.totalRevenue,
+          totalOrders: analyticsData.totalOrders,
+          totalQuantity: analyticsData.totalQuantity,
+          averageOrderValue: averageOrderValue,
+        },
+        insights: insights,
+      });
+
+    if (insertError) {
+      console.error('Failed to save insights to history:', insertError);
+      // Don't fail the request, just log the error
+    } else {
+      console.log('Insights saved to history successfully');
+    }
 
     return new Response(
       JSON.stringify({ insights }),
