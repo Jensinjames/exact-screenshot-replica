@@ -187,6 +187,36 @@ export type Database = {
           },
         ]
       }
+      pricing_insights_history: {
+        Row: {
+          analytics_summary: Json
+          created_at: string
+          created_by: string | null
+          date_range_end: string | null
+          date_range_start: string | null
+          id: string
+          insights: Json
+        }
+        Insert: {
+          analytics_summary: Json
+          created_at?: string
+          created_by?: string | null
+          date_range_end?: string | null
+          date_range_start?: string | null
+          id?: string
+          insights: Json
+        }
+        Update: {
+          analytics_summary?: Json
+          created_at?: string
+          created_by?: string | null
+          date_range_end?: string | null
+          date_range_start?: string | null
+          id?: string
+          insights?: Json
+        }
+        Relationships: []
+      }
       production_plans: {
         Row: {
           created_at: string

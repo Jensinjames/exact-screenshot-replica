@@ -16,11 +16,21 @@ export interface PricingInsights {
   potentialRevenue: string;
 }
 
+export interface PricingInsightsMutationParams {
+  analyticsData: PricingAnalytics;
+  dateRangeStart?: Date;
+  dateRangeEnd?: Date;
+}
+
 export function usePricingInsights() {
   return useMutation({
-    mutationFn: async (analyticsData: PricingAnalytics): Promise<PricingInsights> => {
+    mutationFn: async ({ analyticsData, dateRangeStart, dateRangeEnd }: PricingInsightsMutationParams): Promise<PricingInsights> => {
       const { data, error } = await supabase.functions.invoke('pricing-insights', {
-        body: { analyticsData },
+        body: { 
+          analyticsData,
+          dateRangeStart: dateRangeStart?.toISOString().split('T')[0],
+          dateRangeEnd: dateRangeEnd?.toISOString().split('T')[0],
+        },
       });
 
       if (error) {

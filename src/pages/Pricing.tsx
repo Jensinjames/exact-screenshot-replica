@@ -168,7 +168,12 @@ export default function Pricing() {
       )}
 
       {/* AI Pricing Insights */}
-      <AIPricingInsightsCard analyticsData={data} isLoading={isLoading} />
+      <AIPricingInsightsCard 
+        analyticsData={data} 
+        isLoading={isLoading} 
+        dateRangeStart={startDate}
+        dateRangeEnd={endDate}
+      />
     </div>
   );
 }

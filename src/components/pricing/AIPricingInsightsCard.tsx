@@ -1,18 +1,22 @@
 import { useState } from 'react';
 import { Sparkles, Copy, Check, ChevronDown, ChevronUp, AlertTriangle, Lightbulb, TrendingUp, Eye } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { usePricingInsights, type PricingInsights } from '@/hooks/pricing/usePricingInsights';
+import { InsightsHistoryDialog } from './InsightsHistoryDialog';
 import type { PricingAnalytics } from '@/hooks/pricing';
 
 interface AIPricingInsightsCardProps {
   analyticsData: PricingAnalytics | undefined;
   isLoading: boolean;
+  dateRangeStart?: Date;
+  dateRangeEnd?: Date;
 }
 
-export function AIPricingInsightsCard({ analyticsData, isLoading }: AIPricingInsightsCardProps) {
+export function AIPricingInsightsCard({ analyticsData, isLoading, dateRangeStart, dateRangeEnd }: AIPricingInsightsCardProps) {
   const [insights, setInsights] = useState<PricingInsights | null>(null);
   const [copied, setCopied] = useState(false);
   const [sectionsOpen, setSectionsOpen] = useState({
@@ -21,16 +25,26 @@ export function AIPricingInsightsCard({ analyticsData, isLoading }: AIPricingIns
     risks: true,
   });
 
+  const queryClient = useQueryClient();
   const { mutate: generateInsights, isPending } = usePricingInsights();
 
   const handleGenerateInsights = () => {
     if (!analyticsData) return;
     
-    generateInsights(analyticsData, {
-      onSuccess: (data) => {
-        setInsights(data);
-      },
-    });
+    generateInsights(
+      { analyticsData, dateRangeStart, dateRangeEnd },
+      {
+        onSuccess: (data) => {
+          setInsights(data);
+          // Invalidate history to refetch with new insight
+          queryClient.invalidateQueries({ queryKey: ['pricing-insights-history'] });
+        },
+      }
+    );
+  };
+
+  const handleSelectHistoricalInsight = (historicalInsights: PricingInsights) => {
+    setInsights(historicalInsights);
   };
 
   const handleCopy = async () => {
@@ -86,6 +100,7 @@ Potential Revenue Impact: ${insights.potentialRevenue}
           AI Pricing Insights
         </CardTitle>
         <div className="flex items-center gap-2">
+          <InsightsHistoryDialog onSelectInsight={handleSelectHistoricalInsight} />
           {insights && (
             <Button variant="outline" size="sm" onClick={handleCopy}>
               {copied ? (
