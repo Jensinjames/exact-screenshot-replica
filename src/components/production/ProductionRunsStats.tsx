@@ -1,6 +1,5 @@
 import { Factory, DollarSign, Package } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LoadingState } from '@/components/ui/loading-state';
+import { StatsCard } from '@/components/ui/stats-card';
 import { formatCurrency } from '@/utils/formatters';
 
 interface ProductionRunsStatsProps {
@@ -20,61 +19,34 @@ export function ProductionRunsStats({
 }: ProductionRunsStatsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Runs</CardTitle>
-          <Factory className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <LoadingState variant="skeleton" skeletonType="stat" />
-          ) : (
-            <div className="text-2xl font-bold">{totalRuns}</div>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Doughs Produced</CardTitle>
-          <Package className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <LoadingState variant="skeleton" skeletonType="stat" />
-          ) : (
-            <div className="text-2xl font-bold">{totalDoughs}</div>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Cakes Produced</CardTitle>
-          <Package className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <LoadingState variant="skeleton" skeletonType="stat" />
-          ) : (
-            <div className="text-2xl font-bold">{totalCakes}</div>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Costs</CardTitle>
-          <DollarSign className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <LoadingState variant="skeleton" skeletonType="stat" className="w-24" />
-          ) : (
-            <div className="text-2xl font-bold">{formatCurrency(totalCosts)}</div>
-          )}
-        </CardContent>
-      </Card>
+      <StatsCard
+        title="Total Runs"
+        value={totalRuns}
+        icon={Factory}
+        valueSize="sm"
+        isLoading={isLoading}
+      />
+      <StatsCard
+        title="Doughs Produced"
+        value={totalDoughs}
+        icon={Package}
+        valueSize="sm"
+        isLoading={isLoading}
+      />
+      <StatsCard
+        title="Cakes Produced"
+        value={totalCakes}
+        icon={Package}
+        valueSize="sm"
+        isLoading={isLoading}
+      />
+      <StatsCard
+        title="Total Costs"
+        value={formatCurrency(totalCosts)}
+        icon={DollarSign}
+        valueSize="sm"
+        isLoading={isLoading}
+      />
     </div>
   );
 }
