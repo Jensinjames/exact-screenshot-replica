@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { DollarSign, TrendingUp, ShoppingCart, Package } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -6,10 +7,19 @@ import { RevenueByTypeChart } from '@/components/pricing/RevenueByTypeChart';
 import { RevenueByProductChart } from '@/components/pricing/RevenueByProductChart';
 import { BlendedPriceTable } from '@/components/pricing/BlendedPriceTable';
 import { OpportunityCostCard } from '@/components/pricing/OpportunityCostCard';
+import { DateRangeFilter } from '@/components/pricing/DateRangeFilter';
 import { formatCurrency } from '@/utils/formatters';
 
 export default function Pricing() {
-  const { data, isLoading, error } = usePricingAnalytics();
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
+
+  const { data, isLoading, error } = usePricingAnalytics({ startDate, endDate });
+
+  const handleDateChange = (start: Date | undefined, end: Date | undefined) => {
+    setStartDate(start);
+    setEndDate(end);
+  };
 
   if (error) {
     return (
@@ -23,11 +33,18 @@ export default function Pricing() {
 
   return (
     <div className="space-y-6 p-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Pricing Analytics</h1>
-        <p className="text-muted-foreground">
-          Revenue breakdown, blended metrics, and opportunity cost analysis
-        </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Pricing Analytics</h1>
+          <p className="text-muted-foreground">
+            Revenue breakdown, blended metrics, and opportunity cost analysis
+          </p>
+        </div>
+        <DateRangeFilter
+          startDate={startDate}
+          endDate={endDate}
+          onDateChange={handleDateChange}
+        />
       </div>
 
       {/* Summary Cards */}
