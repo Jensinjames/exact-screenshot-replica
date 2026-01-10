@@ -1,13 +1,13 @@
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { supabase } from '@/integrations/supabase/client';
 import { useProducts } from '@/hooks/products';
 import { useCustomers } from '@/hooks/customers';
+import { useCreateOrder } from '@/hooks/orders';
 import { orderSchema, type OrderFormData } from '@/schemas';
 import type { CakeSize, CakeVariety } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { getPrice, calculateOrderTotal } from '@/utils/pricing';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,17 +29,17 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { toast } from 'sonner';
+
 import { ArrowLeft, CalendarIcon, Plus, Trash2, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 export default function NewOrder() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { user } = useAuth();
   const { data: products } = useProducts();
   const { data: customers } = useCustomers();
+  const createOrderMutation = useCreateOrder();
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
@@ -61,76 +61,20 @@ export default function NewOrder() {
   const customerType = form.watch('customerType');
   const items = form.watch('items');
 
-  const getPrice = (size: CakeSize, variety: CakeVariety): number => {
-    const product = products?.find((p) => p.size === size && p.variety === variety);
-    if (!product) return 0;
-    return customerType === 'wholesale' ? Number(product.wholesale_price) : Number(product.retail_price);
+  const getItemPrice = (size: CakeSize, variety: CakeVariety): number => {
+    return getPrice(products, size, variety, customerType);
   };
 
   const calculateTotal = (): number => {
-    return items.reduce((sum, item) => {
-      return sum + getPrice(item.size, item.variety) * item.quantity;
-    }, 0);
+    const validItems = items.filter((item): item is { size: CakeSize; variety: CakeVariety; quantity: number } => 
+      !!item.size && !!item.variety && typeof item.quantity === 'number'
+    );
+    return calculateOrderTotal(validItems, products, customerType);
   };
 
   const addItem = () => {
     append({ id: crypto.randomUUID(), size: 'medium', variety: 'traditional', quantity: 1 });
   };
-
-  const createOrderMutation = useMutation({
-    mutationFn: async (data: OrderFormData) => {
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          order_number: '',
-          customer_id: data.customerId || null,
-          customer_name: data.customerName,
-          customer_type: data.customerType,
-          pickup_date: data.pickupDate.toISOString().split('T')[0],
-          notes: data.notes || null,
-          total_amount: calculateTotal(),
-          created_by: user?.id,
-        } as any)
-        .select()
-        .single();
-
-      if (orderError) throw orderError;
-
-      const orderItems = data.items.map((item) => {
-        const product = products?.find(
-          (p) => p.size === item.size && p.variety === item.variety
-        );
-        const unitPrice = getPrice(item.size, item.variety);
-        
-        return {
-          order_id: order.id,
-          product_id: product?.id || null,
-          size: item.size,
-          variety: item.variety,
-          quantity: item.quantity,
-          unit_price: unitPrice,
-          total_price: unitPrice * item.quantity,
-        };
-      });
-
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
-
-      if (itemsError) throw itemsError;
-
-      return order;
-    },
-    onSuccess: (order) => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard_stats'] });
-      toast.success('Order created successfully!');
-      navigate(`/orders/${order.id}`);
-    },
-    onError: (error: Error) => {
-      toast.error(error.message);
-    },
-  });
 
   const handleSelectCustomer = (id: string) => {
     form.setValue('customerId', id);
@@ -142,7 +86,21 @@ export default function NewOrder() {
   };
 
   const onSubmit = (data: OrderFormData) => {
-    createOrderMutation.mutate(data);
+    createOrderMutation.mutate({
+      customerId: data.customerId || null,
+      customerName: data.customerName,
+      customerType: data.customerType,
+      pickupDate: data.pickupDate,
+      notes: data.notes || '',
+      items: data.items.map(item => ({
+        id: item.id || crypto.randomUUID(),
+        size: item.size as CakeSize,
+        variety: item.variety as CakeVariety,
+        quantity: item.quantity || 1,
+      })),
+      products,
+      userId: user?.id,
+    });
   };
 
   return (
@@ -350,7 +308,7 @@ export default function NewOrder() {
 
                   <div className="col-span-4 sm:col-span-2 flex items-center justify-between gap-2">
                     <span className="font-medium">
-                      ${(getPrice(items[index]?.size, items[index]?.variety) * (items[index]?.quantity || 1)).toFixed(2)}
+                      ${(getItemPrice(items[index]?.size as CakeSize, items[index]?.variety as CakeVariety) * (items[index]?.quantity || 1)).toFixed(2)}
                     </span>
                     {fields.length > 1 && (
                       <Button
