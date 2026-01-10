@@ -58,6 +58,65 @@ const ChartContainer = React.forwardRef<
 });
 ChartContainer.displayName = "Chart";
 
+/**
+ * Sanitizes a CSS color value to prevent XSS injection.
+ * Only allows valid CSS color formats (hex, rgb, rgba, hsl, hsla, named colors).
+ * Returns null for invalid values.
+ */
+function sanitizeCssColor(color: string): string | null {
+  if (!color || typeof color !== 'string') {
+    return null;
+  }
+  
+  // Remove whitespace and convert to lowercase for validation
+  const trimmedColor = color.trim();
+  
+  // Reject any string containing potentially dangerous characters
+  // Block: <, >, ", ', ;, {, }, (, ) except in valid color functions
+  if (/[<>"'{}]|javascript:|expression\(|url\(/i.test(trimmedColor)) {
+    return null;
+  }
+  
+  // Allow hex colors: #fff, #ffffff, #ffffffff
+  if (/^#[0-9a-fA-F]{3,8}$/.test(trimmedColor)) {
+    return trimmedColor;
+  }
+  
+  // Allow rgb/rgba/hsl/hsla with numeric values only
+  if (/^(rgb|rgba|hsl|hsla)\(\s*[\d.,\s%]+\s*\)$/.test(trimmedColor)) {
+    return trimmedColor;
+  }
+  
+  // Allow CSS custom properties (var references)
+  if (/^var\(\s*--[a-zA-Z0-9-]+\s*\)$/.test(trimmedColor)) {
+    return trimmedColor;
+  }
+  
+  // Allow named colors (common CSS color names)
+  const namedColors = [
+    'transparent', 'currentcolor', 'inherit',
+    'black', 'white', 'red', 'green', 'blue', 'yellow', 'orange', 'purple', 
+    'pink', 'gray', 'grey', 'brown', 'cyan', 'magenta'
+  ];
+  if (namedColors.includes(trimmedColor.toLowerCase())) {
+    return trimmedColor;
+  }
+  
+  return null;
+}
+
+/**
+ * SECURITY NOTE: This component uses dangerouslySetInnerHTML to inject dynamic CSS.
+ * 
+ * Why this is safe:
+ * 1. Chart configuration (ChartConfig) is defined by developers in code, not user input
+ * 2. Color values are sanitized through sanitizeCssColor() before injection
+ * 3. The 'id' value comes from React.useId() or developer-provided props, not user input
+ * 
+ * If chart customization becomes user-controllable in the future:
+ * - All color values must pass through sanitizeCssColor()
+ * - Consider switching to CSS-in-JS or inline style objects as an alternative
+ */
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(([_, config]) => config.theme || config.color);
 
@@ -74,9 +133,11 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
-    const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
+    const rawColor = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
+    const color = rawColor ? sanitizeCssColor(rawColor) : null;
     return color ? `  --color-${key}: ${color};` : null;
   })
+  .filter(Boolean)
   .join("\n")}
 }
 `,
