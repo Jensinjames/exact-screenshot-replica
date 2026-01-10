@@ -1,5 +1,6 @@
 import { Factory, DollarSign, Package } from 'lucide-react';
 import { StatsCard } from '@/components/ui/stats-card';
+import { StatsCardGroup } from '@/components/ui/stats-card-group';
 import { formatCurrency } from '@/utils/formatters';
 
 interface ProductionRunsStatsProps {
@@ -18,7 +19,7 @@ export function ProductionRunsStats({
   isLoading,
 }: ProductionRunsStatsProps) {
   return (
-    <div className="grid gap-4 md:grid-cols-4">
+    <StatsCardGroup columns={4}>
       <StatsCard
         title="Total Runs"
         value={totalRuns}
@@ -47,6 +48,6 @@ export function ProductionRunsStats({
         valueSize="sm"
         isLoading={isLoading}
       />
-    </div>
+    </StatsCardGroup>
   );
 }

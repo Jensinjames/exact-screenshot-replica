@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import { StatsCard } from '@/components/ui/stats-card';
+import { StatsCardGroup } from '@/components/ui/stats-card-group';
 
 interface ProductionPlanStatsProps {
   totalCakes: number;
@@ -15,7 +16,7 @@ export function ProductionPlanStats({
   selectedDate,
 }: ProductionPlanStatsProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <StatsCardGroup columns={3}>
       <StatsCard
         title="Total Cakes"
         value={totalCakes}
@@ -35,6 +36,6 @@ export function ProductionPlanStats({
         description="to fulfill"
         valueSize="lg"
       />
-    </div>
+    </StatsCardGroup>
   );
 }

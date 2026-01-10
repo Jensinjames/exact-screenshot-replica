@@ -1,5 +1,6 @@
 import { ShoppingCart, Clock, DollarSign } from 'lucide-react';
 import { StatsCard } from '@/components/ui/stats-card';
+import { StatsCardGroup } from '@/components/ui/stats-card-group';
 
 interface Order {
   id: string;
@@ -17,7 +18,7 @@ export function OrderStats({ orders }: OrderStatsProps) {
   const totalRevenue = orders.reduce((sum, o) => sum + Number(o.total_amount), 0);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <StatsCardGroup columns={3}>
       <StatsCard
         title="Total Orders"
         value={totalOrders}
@@ -36,6 +37,6 @@ export function OrderStats({ orders }: OrderStatsProps) {
         icon={DollarSign}
         valueSize="sm"
       />
-    </div>
+    </StatsCardGroup>
   );
 }

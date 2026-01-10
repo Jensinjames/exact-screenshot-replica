@@ -1,5 +1,6 @@
 import { User, Building2 } from 'lucide-react';
 import { StatsCard } from '@/components/ui/stats-card';
+import { StatsCardGroup } from '@/components/ui/stats-card-group';
 
 interface CustomerStatsProps {
   total: number;
@@ -9,7 +10,7 @@ interface CustomerStatsProps {
 
 export function CustomerStats({ total, retailCount, wholesaleCount }: CustomerStatsProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <StatsCardGroup columns={3}>
       <StatsCard
         title="Total Customers"
         value={total}
@@ -24,6 +25,6 @@ export function CustomerStats({ total, retailCount, wholesaleCount }: CustomerSt
         value={wholesaleCount}
         icon={Building2}
       />
-    </div>
+    </StatsCardGroup>
   );
 }

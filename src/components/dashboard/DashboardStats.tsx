@@ -1,5 +1,6 @@
 import { ShoppingCart, DollarSign, Clock, AlertTriangle } from 'lucide-react';
 import { StatsCard } from '@/components/ui/stats-card';
+import { StatsCardGroup } from '@/components/ui/stats-card-group';
 
 interface DashboardStatsProps {
   todayOrdersCount: number;
@@ -15,7 +16,7 @@ export function DashboardStats({
   lowStockCount,
 }: DashboardStatsProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <StatsCardGroup columns={4}>
       <StatsCard
         title="Today's Orders"
         value={todayOrdersCount}
@@ -45,6 +46,6 @@ export function DashboardStats({
         variant={lowStockCount > 0 ? 'destructive' : 'hover'}
         className={lowStockCount > 0 ? 'card-hover' : ''}
       />
-    </div>
+    </StatsCardGroup>
   );
 }
