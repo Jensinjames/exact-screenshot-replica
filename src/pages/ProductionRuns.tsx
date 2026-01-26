@@ -1,16 +1,18 @@
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
 import { useProductionRuns } from '@/hooks/production/useProductionRuns';
 import {
   CreateRunDialog,
+  ImportRunsDialog,
   ProductionRunsStats,
   ProductionRunsTable,
 } from '@/components/production';
 
 export default function ProductionRuns() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const { data: runs, isLoading, error } = useProductionRuns();
 
   // Calculate summary stats
@@ -43,10 +45,16 @@ export default function ProductionRuns() {
         title="Production Runs"
         description="Track production batches, costs, and outputs"
         actions={
-          <Button onClick={() => setIsCreateOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            New Run
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setIsImportOpen(true)}>
+              <Upload className="h-4 w-4 mr-2" />
+              Import CSV
+            </Button>
+            <Button onClick={() => setIsCreateOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              New Run
+            </Button>
+          </div>
         }
       />
 
@@ -61,6 +69,7 @@ export default function ProductionRuns() {
       <ProductionRunsTable runs={runs || []} isLoading={isLoading} />
 
       <CreateRunDialog open={isCreateOpen} onOpenChange={setIsCreateOpen} />
+      <ImportRunsDialog open={isImportOpen} onOpenChange={setIsImportOpen} />
     </div>
   );
 }
